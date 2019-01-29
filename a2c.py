@@ -115,22 +115,21 @@ class A2CAgent:
     def _logits_loss(self, acts_and_advs, logits):
         # a trick to input actions and advantages through same API
         actions, advantages = tf.split(acts_and_advs, 2, axis=-1)
-        # polymorphic CE loss function that supports sparse and weighted options
+        # sparse categorical CE loss obj that supports sample_weight arg on call()
         # from_logits argument ensures transformation into normalized probabilities
-        cross_entropy = kls.CategoricalCrossentropy(from_logits=True)
+        weighted_sparse_ce = kls.SparseCategoricalCrossentropy(from_logits=True)
         # policy loss is defined by policy gradients, weighted by advantages
         # note: we only calculate the loss on the actions we've actually taken
-        # thus under the hood a sparse version of CE loss will be executed
         actions = tf.cast(actions, tf.int32)
-        policy_loss = cross_entropy(actions, logits, sample_weight=advantages)
+        policy_loss = weighted_sparse_ce(actions, logits, sample_weight=advantages)
         # entropy loss can be calculated via CE over itself
-        entropy_loss = cross_entropy(logits, logits)
+        entropy_loss = kls.categorical_crossentropy(logits, logits, from_logits=True)
         # here signs are flipped because optimizer minimizes
         return policy_loss - self.params['entropy']*entropy_loss
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    logging.getLogger().setLevel(logging.INFO)
 
     env = gym.make('CartPole-v0')
     model = Model(num_actions=env.action_space.n)
