@@ -11,4 +11,6 @@ You can view the code either as a [notebook](actor-critic-agent-with-tensorflow2
 a self-contained [script](a2c.py), or execute it online with
 [Google Colab](https://colab.research.google.com/drive/1XoHmGiwo2eUN-gzSVLRvE10fIf_ycO1j).
 
-To run it locally, install the dependencies with `pip install -r requirements.txt`.
+To run it locally, install the dependencies with `pip install -r requirements.txt`, and then execute `python a2c.py`.  
+
+To control various hyperparameters, specify them as [flags](https://github.com/inoryy/tensorflow2-deep-reinforcement-learning/blob/master/a2c.py#L12-L17), e.g. `python a2c.py --batch_size=256`.
